@@ -1,528 +1,281 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Oasis Library — Ready</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Oasis Library — Preview</title>
+<style>
+  :root{
+    --bg:#0c0d0e;
+    --panel:#0f1113;
+    --muted:#9aa0a6;
+    --accent:#7f4bf0;
+    --accent-2:#b78cff;
+    --btn:#8f49f0;
+    --glass: rgba(255,255,255,0.03);
+  }
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system,"Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 20% 10%, rgba(150,100,255,0.05), transparent),
+      radial-gradient(800px 400px at 85% 85%, rgba(90,60,160,0.03), transparent),
+      var(--bg);
+    color:#e9eef5;
+    overflow:hidden;
+  }
 
-  <!-- Tailwind + Font Awesome CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  .particles{
+    position:fixed;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;opacity:0.14;
+  }
+  .particle{
+    position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(151,95,255,0.95);
+    filter:blur(1px);opacity:.6;animation:float 12s linear infinite;
+  }
+  @keyframes float{
+    0%{transform:translateY(0) scale(.8);opacity:.6}
+    50%{transform:translateY(-80px) scale(1.1);opacity:1}
+    100%{transform:translateY(0) scale(.9);opacity:.6}
+  }
 
-  <style>
-    :root{
-      --bg-dark: linear-gradient(180deg,#05060a,#071226);
-      --bg-light: linear-gradient(180deg,#f7fbff,#eef6ff);
-      --card-dark: rgba(255,255,255,0.02);
-      --card-light: rgba(0,0,0,0.04);
-      --muted-dark:#9fb3c3;
-      --muted-light:#61717f;
-      --text-dark:#e6eef6;
-      --text-light:#061322;
-      --brand-dark:#b794f4;
-      --brand-light:#6d28d9;
-    }
-    /* default (dark) variables */
-    :root { --bg:var(--bg-dark); --card:var(--card-dark); --muted:var(--muted-dark); --text:var(--text-dark); --brand:var(--brand-dark); }
-    /* light-mode overrides applied when html.light-mode class present */
-    html.light-mode { --bg:var(--bg-light); --card:var(--card-light); --muted:var(--muted-light); --text:var(--text-light); --brand:var(--brand-light); }
+  #splash{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.7));
+    z-index:60;backdrop-filter: blur(3px);
+  }
+  .splash-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:18px;padding:42px 56px;display:flex;align-items:center;flex-direction:column;
+    box-shadow:0 24px 80px rgba(0,0,0,0.7), 0 2px 6px rgba(127,75,240,0.06) inset;
+    transform:scale(.9);opacity:0;animation:splashIn .9s cubic-bezier(.2,.9,.2,1) forwards;
+  }
+  @keyframes splashIn{
+    to{transform:scale(1);opacity:1}
+  }
+  .splash-logo{
+    width:170px;height:170px;border-radius:50%;display:grid;place-items:center;
+    background:linear-gradient(180deg,var(--accent-2),var(--accent));
+    box-shadow:0 12px 32px rgba(127,75,240,0.22),0 0 56px rgba(127,75,240,0.08) inset;
+    margin-bottom:16px;animation:logoPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes logoPulse{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.04)}
+    100%{transform:scale(1)}
+  }
+  .splash-logo img{width:62%;height:auto;display:block}
+  .splash-title{font-size:26px;font-weight:800;color:#fff;margin-top:6px}
+  .splash-sub{color:var(--muted);font-size:13px;margin-top:8px}
 
-    body { background: var(--bg); color: var(--text); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial; margin:0; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
-    .glass { background: var(--card); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.03); }
-    .card-img { aspect-ratio: 2/3; object-fit: cover; border-radius: 12px; width:100%; display:block; }
-    .hero-stars { background-image: radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px); background-size: 20px 20px; }
-    ::-webkit-scrollbar { height: 8px; width: 10px }
-    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 8px }
+  #app{position:relative;height:100%;width:100%;display:flex;align-items:center;justify-content:center;padding:48px;box-sizing:border-box;z-index:1}
 
-   /* panel colors now use theme-aware CSS variables */
-:root {
-  --panel-bg: #06111a;               /* dark panel */
-  --panel-border: rgba(255,255,255,0.03);
-  --panel-text: var(--text);
-  --panel-hover: rgba(255,255,255,0.02);
-  --social-bg: rgba(255,255,255,0.03);
-}
+  .preview-wrap{max-width:1100px;width:100%;display:grid;grid-template-columns:1fr 420px;gap:36px;align-items:start;animation:fadeInUp .7s ease forwards;opacity:0;transform:translateY(10px)}
+  @keyframes fadeInUp{to{opacity:1;transform:translateY(0)}}
 
-/* light theme overrides */
-html.light-mode {
-  --panel-bg: #ffffff;
-  --panel-border: rgba(0,0,0,0.06);
-  --panel-text: var(--text);
-  --panel-hover: rgba(0,0,0,0.04);
-  --social-bg: rgba(0,0,0,0.04);
-}
+  .left{
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));
+    padding:36px;border-radius:12px;min-height:320px;box-shadow:0 8px 30px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.015);
+    display:flex;flex-direction:column;gap:18px;
+  }
+  .right{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    padding:28px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.02);
+  }
 
-/* Slide-over panel */
-.panel {
-  position: fixed;
-  right: 0;
-  top: 0;
-  height: 100vh;
-  width: 340px;
-  max-width: 92%;
-  background: var(--panel-bg);
-  color: var(--panel-text);
-  box-shadow: -20px 0 40px rgba(0,0,0,0.6);
-  transform: translateX(110%);
-  transition: transform .28s ease, background-color .28s ease, color .28s ease;
-  z-index: 70;
-  padding: 20px;
-  border-left: 1px solid var(--panel-border);
-}
+  .brand-title{font-weight:800;font-size:36px;color:var(--accent-2);margin:6px 0 8px}
+  .brand-sub{color:var(--muted);font-size:14px;margin-bottom:6px}
 
-/* open state */
-.panel.open { transform: translateX(0); }
+  .reviews-rotator{margin-top:6px;display:flex;align-items:center;gap:12px}
+  .review-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));
+    padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);
+    color:var(--muted);font-size:15px;min-height:110px;flex:1;position:relative;overflow:hidden;
+  }
+  .r-name{color:#fff;font-weight:700;margin-bottom:6px}
+  .r-rating{color:var(--accent);font-weight:700;margin-left:8px;font-size:13px}
+  .r-text{color:var(--muted);line-height:1.45;font-size:14px}
 
-/* hover and menu item */
-.menu-item { display:flex; gap:12px; align-items:center; padding:12px 6px; border-radius:8px; cursor:pointer; }
-.menu-item:hover { background: var(--panel-hover); }
+  .rot-nav{width:120px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  .rot-meta{font-size:12px;color:var(--muted);text-align:right}
 
-/* social buttons */
-.socials a { width:40px; height:40px; display:inline-grid; place-items:center; border-radius:8px; background: var(--social-bg); color:inherit; text-decoration:none; }
+  .fader{position:absolute;inset:0;padding:18px;opacity:0;transform:translateY(8px);transition:all 420ms cubic-bezier(.2,.9,.2,1)}
+  .fader.visible{opacity:1;transform:translateY(0)}
 
-/* close button uses panel text color */
-.close-btn { position:absolute; left:12px; top:12px; background:transparent; border:0; color: var(--panel-text); font-size:18px; cursor:pointer; }
+  .signin-title{font-size:28px;font-weight:800;color:var(--accent-2);margin-bottom:8px}
+  .signin-sub{color:var(--muted);font-size:13px;margin-bottom:18px}
 
+  label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+  input{
+    width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);
+    background:rgba(255,255,255,0.01);color:#fff;font-size:14px;
+  }
+  .actions{margin-top:18px}
+  .btn{
+    border:none;padding:12px 18px;border-radius:12px;background:linear-gradient(180deg,var(--btn),var(--accent-2));
+    color:#fff;font-weight:700;cursor:pointer;
+  }
+  #msg{margin-top:10px;font-size:13px;height:18px;color:#ff7676}
 
-    /* collapsible content base */
-    .section-content { overflow:hidden; max-height:0; opacity:0; transition: max-height 320ms ease, opacity 260ms ease; display:block; }
-    .section-content.open { opacity:1; }
+  #signedOverlay{
+    position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+    z-index:80;background:rgba(0,0,0,0.55)
+  }
+  .signed-card{
+    background:var(--panel);padding:28px;border-radius:14px;text-align:center;
+    box-shadow:0 10px 50px rgba(0,0,0,0.6)
+  }
+  .signed-card h3{color:var(--accent-2);margin:0}
+  .signed-card p{color:var(--muted);margin-top:8px}
 
-    /* small responsive tweaks */
-    @media (max-width:640px){
-      .panel { width:92%; }
-      .card-img{ border-radius:10px; }
-    }
-  </style>
+</style>
 </head>
-<body class="antialiased">
+<body>
 
-  <!-- NAV -->
-  <nav class="px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <div id="brandLogo" class="bg-violet-600 p-2 rounded-full shadow-md"><i class="fa-solid fa-book-open text-white"></i></div>
-      <div id="brandText" class="text-2xl font-bold" style="color:var(--brand)">Oasis Library</div>
+<div class="particles" id="particleLayer"></div>
+
+<div id="splash">
+  <div class="splash-card">
+    <div class="splash-logo">
+      <img src="logo.png" alt="logo">
     </div>
+    <div class="splash-title">Oasis Library</div>
+    <div class="splash-sub">A calm place to discover books — loading preview</div>
+  </div>
+</div>
 
-    <div class="flex items-center gap-3 text-sm text-slate-300">
-      <button id="menuBtn" class="p-2 rounded-full hover:bg-white/3" title="Menu" aria-label="Open menu">
-        <i class="fa-solid fa-bars text-lg"></i>
-      </button>
-    </div>
-  </nav>
+<div id="signedOverlay">
+  <div class="signed-card">
+    <h3>Signing you in…</h3>
+    <p>Please wait…</p>
+  </div>
+</div>
 
-  <!-- HERO -->
-  <header class="relative">
-    <div class="h-[44vh] md:h-[50vh] rounded-b-2xl overflow-hidden relative">
-      <div style="background:linear-gradient(180deg, rgba(2,6,23,0.6), rgba(2,6,23,0.85));" class="absolute inset-0 z-10"></div>
-      <img id="heroImg" src="hero2.jpg" alt="hero" class="w-full h-full object-cover brightness-50" />
-      <div class="absolute inset-0 hero-stars z-20"></div>
-      <div class="absolute inset-0 flex flex-col items-center justify-center px-6 z-30">
-        <h1 class="text-3xl md:text-5xl font-extrabold text-center max-w-3xl leading-tight">What would you like to read today?</h1>
+<div id="app"></div>
 
-        <div class="mt-6 w-full max-w-2xl">
-          <div class="flex items-center gap-3 glass p-3 rounded-full shadow-sm">
-            <i class="fa-solid fa-magnifying-glass text-slate-300 ml-2"></i>
-            <input id="globalSearch" class="bg-transparent outline-none flex-1 text-white placeholder:text-slate-300" placeholder="Search books, authors or tags..." />
-            <button id="searchClear" class="text-sm px-3 py-2 rounded-full bg-white/6 hover:bg-white/8">Clear</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- MAIN CONTENT -->
-  <main class="px-6 py-8 max-w-7xl mx-auto">
-    <section class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-bold">Recommended</h2>
-    </section>
-
-    <section id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6"></section>
-
-    <div id="loader" class="mt-8 flex justify-center items-center">
-      <div class="w-10 h-10 rounded-full border-4 border-t-transparent border-white/10 animate-spin"></div>
-    </div>
-
-    <div class="mt-12 text-center text-slate-400">Made with ❤️ — scroll to load more books</div>
-  </main>
-
-  <!-- CARD TEMPLATE -->
-  <template id="cardTpl">
-    <div class="card group relative">
-      <div class="overflow-hidden rounded-xl">
-        <img class="card-img transition-transform duration-300 group-hover:scale-105" />
-      </div>
-      <div class="mt-3">
-        <div class="font-semibold text-white" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden"></div>
-        <div class="text-sm text-slate-400 mt-2">Author • <span class="year"></span></div>
-      </div>
-      <div class="absolute right-3 top-3 p-2 rounded-full bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
-        <i class="fa-solid fa-ellipsis-vertical"></i>
-      </div>
-    </div>
-  </template>
-
-  <!-- MENU OVERLAY -->
-  <div id="menuOverlay" class="overlay" aria-hidden="true"></div>
-
-  <!-- SLIDE-OVER PANEL with collapsible Settings & About -->
-  <aside id="menuPanel" class="panel" aria-hidden="true" role="dialog" aria-label="Site menu">
-    <button id="closeMenu" class="close-btn" title="Close menu"><i class="fa-solid fa-xmark"></i></button>
-    <div class="brand">
-      <div class="bg-violet-600 p-2 rounded-full"><i class="fa-solid fa-book-open text-white"></i></div>
-      <div>Oasis Library</div>
-    </div>
-
-    <nav style="margin-top:18px">
-      <div class="menu-item" id="menuSettingsBtn" aria-expanded="false" role="button" tabindex="0">
-        <i class="fa-solid fa-gear text-slate-300"></i>
-        <div>
-          <div style="font-weight:600">Settings</div>
-          <div style="font-size:12px;color:var(--muted)">Appearance & preferences</div>
-        </div>
-        <div style="margin-left:auto;color:var(--muted);"><i class="fa-solid fa-chevron-down"></i></div>
-      </div>
-
-      <div class="section-content" id="settingsContent" aria-hidden="true" style="padding:8px 6px 14px 44px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div style="display:flex;gap:10px;align-items:center;">
-            <div id="themeIcon" style="width:36px;height:36px;border-radius:8px;display:grid;place-items:center;background:rgba(255,255,255,0.03)">
-              <i class="fa-solid fa-moon"></i>
-            </div>
-            <div>
-              <div style="font-weight:600">Theme</div>
-              <div style="font-size:12px;color:var(--muted)">Switch day / night mode</div>
-            </div>
-          </div>
-          <button id="settingsThemeToggle" class="px-3 py-2 rounded bg-white/6">Toggle</button>
-        </div>
-      </div>
-
-      <div class="menu-item" id="menuAboutBtn" aria-expanded="false" role="button" tabindex="0">
-        <i class="fa-regular fa-circle-question text-slate-300"></i>
-        <div>
-          <div style="font-weight:600">About & FAQ</div>
-          <div style="font-size:12px;color:var(--muted)">Learn about the project</div>
-        </div>
-        <div style="margin-left:auto;color:var(--muted);"><i class="fa-solid fa-chevron-down"></i></div>
-      </div>
-
-      <div class="section-content" id="aboutContent" aria-hidden="true" style="padding:8px 6px 14px 44px;">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">About text (editable)</div>
-        <textarea id="aboutTextInline" style="width:100%;height:120px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text)"></textarea>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-          <button id="saveAboutInline" class="px-3 py-2 rounded bg-white/6">Save</button>
-          <button id="genAboutInline" class="px-3 py-2 rounded bg-white/6">Generate</button>
-        </div>
-
-        <hr style="border-color:rgba(255,255,255,0.03);margin:12px 0">
-
-        <div>
-          <h4 style="font-weight:600">FAQ</h4>
-          <div style="font-size:14px;color:var(--muted);margin-top:8px">
-            <strong>Q:</strong> How do I add books?<br>
-            <strong>A:</strong> This demo shows covers via Google Books. Uploads/storage can be added later.<br><br>
-            <strong>Q:</strong> Is this free?<br>
-            <strong>A:</strong> The demo uses free APIs and local storage for settings.
-          </div>
-        </div>
-      </div>
-
-      <div class="menu-item" id="menuDonateBtn">
-        <i class="fa-solid fa-hand-holding-dollar text-slate-300"></i>
-        <div>
-          <div style="font-weight:600">Donate</div>
-          <div style="font-size:12px;color:var(--muted)">Support development</div>
-        </div>
-      </div>
-    </nav>
-
-    <hr style="border-color:rgba(255,255,255,0.03);margin:16px 0">
-
-    <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Follow us</div>
-    <div class="socials" id="socialsList">
-      <a id="socialInsta" href="#" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-      <a id="socialTwitter" href="#" target="_blank" title="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-      <a id="socialGithub" href="#" target="_blank" title="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a id="socialLinkedin" href="#" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
-    </div>
-
-    <div style="position:absolute;left:20px;bottom:18px;font-size:12px;color:#8b98a6">© Oasis Library</div>
-  </aside>
-
-  <!-- MAIN JS -->
-  <script>
-  /***** CONFIG - replace these with your real links *****/
-  const PAYMENT_URL = 'upi://pay?pa=huaweiwasim7@okhdfcbank&pn=wasim%20Akram&aid=uGICAgMCj9_jLOw'; // <-- put your gateway or custom payment URL here
-  const SOCIAL_URLS = {
-    instagram: 'https://instagram.com/akmisaw',
-    twitter: 'https://twitter.com',
-    github: 'https://github.com/huaweiwasim7-ai',
-    linkedin: 'https://linkedin.com/in/wasim-akram-4894071b0'
-  };
-
-  /***** Set social links *****/
-  document.getElementById('socialInsta').href = SOCIAL_URLS.instagram;
-  document.getElementById('socialTwitter').href = SOCIAL_URLS.twitter;
-  document.getElementById('socialGithub').href = SOCIAL_URLS.github;
-  document.getElementById('socialLinkedin').href = SOCIAL_URLS.linkedin;
-
-  /***** Slide-over open/close logic *****/
-  const menuBtn = document.getElementById('menuBtn');
-  const menuPanel = document.getElementById('menuPanel');
-  const menuOverlay = document.getElementById('menuOverlay');
-  const closeMenu = document.getElementById('closeMenu');
-
-  function openMenu(){
-    menuPanel.classList.add('open');
-    menuOverlay.style.display='block';
-    menuPanel.setAttribute('aria-hidden','false');
-    menuOverlay.setAttribute('aria-hidden','false');
-    document.body.style.overflow='hidden';
+<script>
+/* particles */
+const particleLayer = document.getElementById('particleLayer');
+(function makeParticles(n=26){
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.top=Math.random()*100+'%';
+    p.style.width=p.style.height=(4+Math.random()*10)+'px';
+    particleLayer.appendChild(p);
   }
-  function hideMenu(){
-    menuPanel.classList.remove('open');
-    menuOverlay.style.display='none';
-    menuPanel.setAttribute('aria-hidden','true');
-    menuOverlay.setAttribute('aria-hidden','true');
-    document.body.style.overflow='';
-    // collapse sections
-    collapseSection(settingsContent);
-    collapseSection(aboutContent);
-  }
-  menuBtn?.addEventListener('click', openMenu);
-  closeMenu?.addEventListener('click', hideMenu);
-  menuOverlay?.addEventListener('click', hideMenu);
-  document.addEventListener('keydown', e=> { if(e.key === 'Escape') hideMenu(); });
+})();
 
-  /***** Collapsible sections logic (Settings & About) *****/
-  const settingsBtn = document.getElementById('menuSettingsBtn');
-  const aboutBtn = document.getElementById('menuAboutBtn');
-  const settingsContent = document.getElementById('settingsContent');
-  const aboutContent = document.getElementById('aboutContent');
+/* Splash -> Preview */
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').style.opacity=0;
+    setTimeout(()=>{
+      document.getElementById('splash').style.display='none';
+      renderPreview();
+    },500);
+  },5000);
+});
 
-  // ensure proper base styles (already in CSS) but set initial
-  [settingsContent, aboutContent].forEach(el=>{
-    el.style.maxHeight = '0px';
-    el.style.opacity = '0';
-    el.style.overflow = 'hidden';
+/* Fake reviews */
+const reviews = [
+  {name:"Amelia Carter",text:"Love the curated suggestions — I found books I never knew I needed.",rating:5},
+  {name:"Liam Roberts",text:"Smooth, minimal UI. Reading at night is so comfortable here.",rating:5},
+  {name:"Sophia Patel",text:"Great recommendations and the preview helped me decide quickly.",rating:5},
+  {name:"Noah Walker",text:"Impressive selection and fast loading. Nice work.",rating:4},
+  {name:"Maya Singh",text:"Clean interface and easy to use — my new reading spot.",rating:5}
+];
+
+/* Render Preview */
+function renderPreview(){
+  document.getElementById('app').innerHTML = `
+    <div class="preview-wrap">
+      <section class="left">
+        <div class="brand-title">Oasis Library</div>
+        <div class="brand-sub">Welcome — sign in to continue.</div>
+        <div class="reviews-rotator">
+          <div class="review-card" id="reviewCard"></div>
+        </div>
+      </section>
+
+      <aside class="right">
+        <div class="signin-title">Hello There, Reader!</div>
+        <div class="signin-sub">Enter login to continue.</div>
+
+        <label>Username</label>
+        <input id="username" type="text">
+
+        <label style="margin-top:12px;">Password</label>
+        <input id="password" type="password">
+
+        <div class="actions">
+          <button id="signBtn" class="btn">Sign In</button>
+        </div>
+        <div id="msg"></div>
+      </aside>
+    </div>
+  `;
+
+  attachReviewRotator();
+  attachSignHandler();
+}
+
+/* Rotator */
+let currentIndex=0;
+function attachReviewRotator(){
+  const container=document.getElementById('reviewCard');
+  reviews.forEach((r,i)=>{
+    const d=document.createElement('div');
+    d.className='fader';
+    d.id='fader-'+i;
+    d.innerHTML=`<div class="r-name">${r.name}<span class="r-rating">${'★'.repeat(r.rating)}</span></div>
+                 <div class="r-text">${r.text}</div>`;
+    if(i===0) d.classList.add('visible');
+    container.appendChild(d);
   });
+  setInterval(()=>{
+    const prev=currentIndex;
+    currentIndex=(currentIndex+1)%reviews.length;
+    showIndex(prev,currentIndex);
+  },3200);
+}
 
-  function expandSection(el){
-    // collapse other
-    [settingsContent, aboutContent].forEach(s => { if(s !== el) collapseSection(s); });
-    el.classList.add('open');
-    el.style.display = 'block';
-    // measure and expand
-    const natural = el.scrollHeight + 20;
-    requestAnimationFrame(()=> {
-      el.style.maxHeight = natural + 'px';
-      el.style.opacity = '1';
-      el.setAttribute('aria-hidden','false');
-    });
-  }
-  function collapseSection(el){
-    if(!el) return;
-    el.style.maxHeight = '0px';
-    el.style.opacity = '0';
-    el.setAttribute('aria-hidden','true');
-    // keep display:block to allow transitions; optional hide later
-    setTimeout(()=> { /* no-op */ }, 320);
-    el.classList.remove('open');
-  }
+function showIndex(a,b){
+  document.getElementById('fader-'+a).classList.remove('visible');
+  document.getElementById('fader-'+b).classList.add('visible');
+}
 
-  settingsBtn?.addEventListener('click', ()=>{
-    const expanded = settingsBtn.getAttribute('aria-expanded') === 'true';
-    settingsBtn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-    if(!expanded) expandSection(settingsContent); else collapseSection(settingsContent);
-  });
+/* Sign-In Handler */
+function attachSignHandler(){
+  const btn=document.getElementById('signBtn');
+  const msg=document.getElementById('msg');
 
-  aboutBtn?.addEventListener('click', ()=>{
-    const expanded = aboutBtn.getAttribute('aria-expanded') === 'true';
-    aboutBtn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-    if(!expanded) expandSection(aboutContent); else collapseSection(aboutContent);
-  });
+  btn.addEventListener('click',()=>{
 
-  /***** THEME / Settings (toggle persists) *****/
-  const themeToggleBtn = document.getElementById('settingsThemeToggle');
-  const themeIcon = document.getElementById('themeIcon');
+    const u=document.getElementById('username').value.trim();
+    const p=document.getElementById('password').value;
 
-  function applyTheme(name){
-    if(name === 'light'){
-      document.documentElement.classList.add('light-mode');
-      localStorage.setItem('oasis_theme','light');
-      themeIcon.innerHTML = '<i class="fa-solid fa-sun"></i>';
-      themeToggleBtn.textContent = 'Light';
+    if(u==='admin' && p==='gullit'){
+      renderSignedIn();
     } else {
-      document.documentElement.classList.remove('light-mode');
-      localStorage.setItem('oasis_theme','dark');
-      themeIcon.innerHTML = '<i class="fa-solid fa-moon"></i>';
-      themeToggleBtn.textContent = 'Dark';
+      msg.textContent='Authentication failed — incorrect credentials.';
     }
-  }
-  const savedTheme = localStorage.getItem('oasis_theme') || 'dark';
-  applyTheme(savedTheme);
-
-  themeToggleBtn.addEventListener('click', ()=>{
-    const now = localStorage.getItem('oasis_theme') === 'light' ? 'dark' : 'light';
-    applyTheme(now);
   });
+}
 
-  /***** ABOUT inline editor handlers *****/
-  const aboutTextInline = document.getElementById('aboutTextInline');
-  const saveAboutInline = document.getElementById('saveAboutInline');
-  const genAboutInline = document.getElementById('genAboutInline');
+/* ✔️ THIS IS THE UPDATED FUNCTION WITH REDIRECT TO library.html */
+function renderSignedIn(){
+  try{ sessionStorage.setItem('oasisSignedIn','true'); }catch(e){}
+  
+  const overlay=document.getElementById('signedOverlay');
+  overlay.style.display='flex';
 
-  const defaultAbout = `Oasis Library is a lightweight, privacy-first digital bookshelf. We aggregate cover art and details using Google Books and provide a clean interface for readers to discover new titles. This demo is built for speed and simplicity.`;
+  setTimeout(()=>{
+    window.location.href='library.html';   // redirect
+  },650);
+}
+</script>
 
-  aboutTextInline.value = localStorage.getItem('oasis_about') || defaultAbout;
-
-  saveAboutInline.addEventListener('click', ()=>{
-    localStorage.setItem('oasis_about', aboutTextInline.value);
-    saveAboutInline.textContent = 'Saved';
-    setTimeout(()=> saveAboutInline.textContent = 'Save', 1200);
-  });
-
-  genAboutInline.addEventListener('click', ()=>{
-    aboutTextInline.value = defaultAbout;
-    genAboutInline.textContent = 'Generated';
-    setTimeout(()=> genAboutInline.textContent = 'Generate', 900);
-  });
-
-  /***** Donate handler *****/
-  document.getElementById('menuDonateBtn').addEventListener('click', ()=>{
-    hideMenu();
-    window.open(PAYMENT_URL, '_blank');
-  });
-
-  /***** GOOGLE BOOKS LOADER (infinite scroll + search) *****/
-  const grid = document.getElementById('grid');
-  const tpl = document.getElementById('cardTpl').content;
-  const loaderEl = document.getElementById('loader');
-  const searchInput = document.getElementById('globalSearch');
-  const searchClear = document.getElementById('searchClear');
-
-  let startIndex = 0;
-  const PAGE_SIZE = 20;
-  let q = '';
-  let loading = false;
-  let exhausted = false;
-  let totalItems = Infinity;
-  const fetchedIds = new Set();
-
-  function gbCoverFromVolume(v){
-    const links = v.volumeInfo && v.volumeInfo.imageLinks;
-    if(links){
-      return (links.thumbnail || links.smallThumbnail).replace(/^http:/, 'https:');
-    }
-    return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600"><rect width="100%" height="100%" fill="%23111"/><text x="50%" y="50%" fill="%23aaa" font-size="20" font-family="Arial" text-anchor="middle">No Cover</text></svg>';
-  }
-
-  function renderBook(book){
-    const node = tpl.cloneNode(true);
-    const card = node.querySelector('.card');
-    const img = node.querySelector('img.card-img');
-    img.src = book.cover;
-    img.alt = book.title;
-    node.querySelector('.font-semibold').textContent = book.title;
-    node.querySelector('.year').textContent = book.year || '';
-    const meta = node.querySelector('.text-sm');
-    meta.textContent = book.author ? (book.author + ' • ') : '';
-    meta.appendChild(document.createTextNode(book.year || ''));
-    card.addEventListener('click', ()=> {
-      if(book.infoLink) window.open(book.infoLink, '_blank');
-      else alert(book.title + '\n' + (book.author || ''));
-    });
-    grid.appendChild(node);
-  }
-
-  async function fetchBooksFromGoogle(start, query){
-    const base = 'https://www.googleapis.com/books/v1/volumes';
-    const params = new URLSearchParams();
-    params.set('q', query || 'subject:fiction');
-    params.set('startIndex', start);
-    params.set('maxResults', PAGE_SIZE);
-    const url = base + '?' + params.toString();
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('Google Books fetch failed: ' + res.status);
-    return res.json();
-  }
-
-  async function loadMore(){
-    if(loading || exhausted) return;
-    if(startIndex >= totalItems) { exhausted = true; loaderEl.style.display='none'; return; }
-    loading = true;
-    loaderEl.style.display = 'flex';
-    try{
-      const data = await fetchBooksFromGoogle(startIndex, q);
-      totalItems = data.totalItems || 0;
-      const items = data.items || [];
-      let added = 0;
-      for(const it of items){
-        const unique = it.id || (it.volumeInfo && it.volumeInfo.title) || (Math.random()+'');
-        if(fetchedIds.has(unique)) continue;
-        fetchedIds.add(unique);
-        const book = {
-          id: unique,
-          title: it.volumeInfo?.title || 'Untitled',
-          author: (it.volumeInfo?.authors && it.volumeInfo.authors[0]) || '',
-          year: it.volumeInfo?.publishedDate ? it.volumeInfo.publishedDate.split('-')[0] : '',
-          cover: gbCoverFromVolume(it),
-          infoLink: it.volumeInfo?.infoLink || ''
-        };
-        renderBook(book);
-        added++;
-      }
-      startIndex += PAGE_SIZE;
-      if(startIndex >= Math.min(totalItems, 1000)) exhausted = true;
-      if(items.length === 0) exhausted = true;
-    }catch(err){
-      console.error('Load error', err);
-      exhausted = true;
-    }finally{
-      loading = false;
-      loaderEl.style.display = exhausted ? 'none' : 'flex';
-    }
-  }
-
-  /* initial load */
-  loadMore();
-
-  /* infinite scroll trigger */
-  window.addEventListener('scroll', ()=>{
-    const scrollPos = window.innerHeight + window.scrollY;
-    const nearBottom = document.body.offsetHeight - 700;
-    if(scrollPos > nearBottom) loadMore();
-  }, { passive: true });
-
-  /* search */
-  let searchTimer = null;
-  searchInput.addEventListener('input', (e)=>{
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(()=> {
-      const val = e.target.value.trim();
-      startSearch(val);
-    }, 350);
-  });
-  searchClear.addEventListener('click', ()=>{ searchInput.value=''; startSearch(''); });
-
-  function clearGrid(){
-    grid.innerHTML = '';
-    fetchedIds.clear();
-    startIndex = 0;
-    exhausted = false;
-    totalItems = Infinity;
-  }
-
-  async function startSearch(val){
-    q = val || '';
-    clearGrid();
-    loaderEl.style.display = 'flex';
-    await loadMore();
-  }
-
-  searchInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') { clearTimeout(searchTimer); startSearch(searchInput.value.trim()); } });
-
-  </script>
 </body>
 </html>
