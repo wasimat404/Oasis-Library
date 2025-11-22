@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Oasis Library — Preview</title>
+<style>
+  :root{
+    --bg:#0c0d0e;
+    --panel:#0f1113;
+    --muted:#9aa0a6;
+    --accent:#7f4bf0;
+    --accent-2:#b78cff;
+    --btn:#8f49f0;
+    --glass: rgba(255,255,255,0.03);
+  }
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system,"Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 20% 10%, rgba(150,100,255,0.05), transparent),
+      radial-gradient(800px 400px at 85% 85%, rgba(90,60,160,0.03), transparent),
+      var(--bg);
+    color:#e9eef5;
+    overflow:hidden;
+  }
+
+  .particles{
+    position:fixed;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;opacity:0.14;
+  }
+  .particle{
+    position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(151,95,255,0.95);
+    filter:blur(1px);opacity:.6;animation:float 12s linear infinite;
+  }
+  @keyframes float{
+    0%{transform:translateY(0) scale(.8);opacity:.6}
+    50%{transform:translateY(-80px) scale(1.1);opacity:1}
+    100%{transform:translateY(0) scale(.9);opacity:.6}
+  }
+
+  #splash{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.7));
+    z-index:60;backdrop-filter: blur(3px);
+  }
+  .splash-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:18px;padding:42px 56px;display:flex;align-items:center;flex-direction:column;
+    box-shadow:0 24px 80px rgba(0,0,0,0.7), 0 2px 6px rgba(127,75,240,0.06) inset;
+    transform:scale(.9);opacity:0;animation:splashIn .9s cubic-bezier(.2,.9,.2,1) forwards;
+  }
+  @keyframes splashIn{
+    to{transform:scale(1);opacity:1}
+  }
+  .splash-logo{
+    width:170px;height:170px;border-radius:50%;display:grid;place-items:center;
+    background:linear-gradient(180deg,var(--accent-2),var(--accent));
+    box-shadow:0 12px 32px rgba(127,75,240,0.22),0 0 56px rgba(127,75,240,0.08) inset;
+    margin-bottom:16px;animation:logoPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes logoPulse{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.04)}
+    100%{transform:scale(1)}
+  }
+  .splash-logo img{width:62%;height:auto;display:block}
+  .splash-title{font-size:26px;font-weight:800;color:#fff;margin-top:6px}
+  .splash-sub{color:var(--muted);font-size:13px;margin-top:8px}
+
+  #app{position:relative;height:100%;width:100%;display:flex;align-items:center;justify-content:center;padding:48px;box-sizing:border-box;z-index:1}
+
+  .preview-wrap{max-width:1100px;width:100%;display:grid;grid-template-columns:1fr 420px;gap:36px;align-items:start;animation:fadeInUp .7s ease forwards;opacity:0;transform:translateY(10px)}
+  @keyframes fadeInUp{to{opacity:1;transform:translateY(0)}}
+
+  .left{
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));
+    padding:36px;border-radius:12px;min-height:320px;box-shadow:0 8px 30px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.015);
+    display:flex;flex-direction:column;gap:18px;
+  }
+  .right{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    padding:28px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.02);
+  }
+
+  .brand-title{font-weight:800;font-size:36px;color:var(--accent-2);margin:6px 0 8px}
+  .brand-sub{color:var(--muted);font-size:14px;margin-bottom:6px}
+
+  .reviews-rotator{margin-top:6px;display:flex;align-items:center;gap:12px}
+  .review-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));
+    padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);
+    color:var(--muted);font-size:15px;min-height:110px;flex:1;position:relative;overflow:hidden;
+  }
+  .r-name{color:#fff;font-weight:700;margin-bottom:6px}
+  .r-rating{color:var(--accent);font-weight:700;margin-left:8px;font-size:13px}
+  .r-text{color:var(--muted);line-height:1.45;font-size:14px}
+
+  .rot-nav{width:120px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  .rot-meta{font-size:12px;color:var(--muted);text-align:right}
+
+  .fader{position:absolute;inset:0;padding:18px;opacity:0;transform:translateY(8px);transition:all 420ms cubic-bezier(.2,.9,.2,1)}
+  .fader.visible{opacity:1;transform:translateY(0)}
+
+  .signin-title{font-size:28px;font-weight:800;color:var(--accent-2);margin-bottom:8px}
+  .signin-sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+
+  label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+  input{
+    width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);
+    background:rgba(255,255,255,0.01);color:#fff;font-size:14px;
+  }
+  .actions{margin-top:18px}
+  .btn{
+    border:none;padding:12px 18px;border-radius:12px;background:linear-gradient(180deg,var(--btn),var(--accent-2));
+    color:#fff;font-weight:700;cursor:pointer;
+  }
+  #msg{margin-top:10px;font-size:13px;height:18px;color:#ff7676}
+
+  #signedOverlay{
+    position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+    z-index:80;background:rgba(0,0,0,0.55)
+  }
+  .signed-card{
+    background:var(--panel);padding:28px;border-radius:14px;text-align:center;
+    box-shadow:0 10px 50px rgba(0,0,0,0.6)
+  }
+  .signed-card h3{color:var(--accent-2);margin:0}
+  .signed-card p{color:var(--muted);margin-top:8px}
+
+</style>
+</head>
+<body>
+
+<div class="particles" id="particleLayer"></div>
+
+<div id="splash">
+  <div class="splash-card">
+    <div class="splash-logo">
+      <img src="logo.png" alt="logo">
+    </div>
+    <div class="splash-title">Oasis Library</div>
+    <div class="splash-sub">A calm place to discover books — loading preview</div>
+  </div>
+</div>
+
+<div id="signedOverlay">
+  <div class="signed-card">
+    <h3>Signing you in…</h3>
+    <p>Please wait…</p>
+  </div>
+</div>
+
+<div id="app"></div>
+
+<script>
+/* particles */
+const particleLayer = document.getElementById('particleLayer');
+(function makeParticles(n=26){
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.top=Math.random()*100+'%';
+    p.style.width=p.style.height=(4+Math.random()*10)+'px';
+    particleLayer.appendChild(p);
+  }
+})();
+
+/* Splash -> Preview */
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{
+    document.getElementById('splash').style.opacity=0;
+    setTimeout(()=>{
+      document.getElementById('splash').style.display='none';
+      renderPreview();
+    },500);
+  },5000);
+});
+
+/* Fake reviews */
+const reviews = [
+  {name:"Amelia Carter",text:"Love the curated suggestions — I found books I never knew I needed.",rating:5},
+  {name:"Liam Roberts",text:"Smooth, minimal UI. Reading at night is so comfortable here.",rating:5},
+  {name:"Sophia Patel",text:"Great recommendations and the preview helped me decide quickly.",rating:5},
+  {name:"Noah Walker",text:"Impressive selection and fast loading. Nice work.",rating:4},
+  {name:"Maya Singh",text:"Clean interface and easy to use — my new reading spot.",rating:5}
+];
+
+/* Render Preview */
+function renderPreview(){
+  document.getElementById('app').innerHTML = `
+    <div class="preview-wrap">
+      <section class="left">
+        <div class="brand-title">Oasis Library</div>
+        <div class="brand-sub">Welcome — sign in to continue.</div>
+        <div class="reviews-rotator">
+          <div class="review-card" id="reviewCard"></div>
+        </div>
+      </section>
+
+      <aside class="right">
+        <div class="signin-title">Hello There, Reader!</div>
+        <div class="signin-sub">Enter login to continue.</div>
+
+        <label>Username</label>
+        <input id="username" type="text">
+
+        <label style="margin-top:12px;">Password</label>
+        <input id="password" type="password">
+
+        <div class="actions">
+          <button id="signBtn" class="btn">Sign In</button>
+        </div>
+        <div id="msg"></div>
+      </aside>
+    </div>
+  `;
+
+  attachReviewRotator();
+  attachSignHandler();
+}
+
+/* Rotator */
+let currentIndex=0;
+function attachReviewRotator(){
+  const container=document.getElementById('reviewCard');
+  reviews.forEach((r,i)=>{
+    const d=document.createElement('div');
+    d.className='fader';
+    d.id='fader-'+i;
+    d.innerHTML=`<div class="r-name">${r.name}<span class="r-rating">${'★'.repeat(r.rating)}</span></div>
+                 <div class="r-text">${r.text}</div>`;
+    if(i===0) d.classList.add('visible');
+    container.appendChild(d);
+  });
+  setInterval(()=>{
+    const prev=currentIndex;
+    currentIndex=(currentIndex+1)%reviews.length;
+    showIndex(prev,currentIndex);
+  },3200);
+}
+
+function showIndex(a,b){
+  document.getElementById('fader-'+a).classList.remove('visible');
+  document.getElementById('fader-'+b).classList.add('visible');
+}
+
+/* Sign-In Handler */
+function attachSignHandler(){
+  const btn=document.getElementById('signBtn');
+  const msg=document.getElementById('msg');
+
+  btn.addEventListener('click',()=>{
+
+    const u=document.getElementById('username').value.trim();
+    const p=document.getElementById('password').value;
+
+    if(u==='admin' && p==='gullit'){
+      renderSignedIn();
+    } else {
+      msg.textContent='Authentication failed — incorrect credentials.';
+    }
+  });
+}
+
+/* ✔️ THIS IS THE UPDATED FUNCTION WITH REDIRECT TO library.html */
+function renderSignedIn(){
+  try{ sessionStorage.setItem('oasisSignedIn','true'); }catch(e){}
+  
+  const overlay=document.getElementById('signedOverlay');
+  overlay.style.display='flex';
+
+  setTimeout(()=>{
+    window.location.href='library.html';   // redirect
+  },650);
+}
+</script>
+
+</body>
+</html>
